@@ -25,11 +25,23 @@ class Snake:
         Create 3 square shaped turtles which are together align in the axis.
         """
         for position in STARTING_POSITIONS:
-            new_segment = Turtle(shape="square")
-            new_segment.penup()
-            new_segment.color("white")
-            new_segment.goto(position)
-            self.segments.append(new_segment)
+            self.add_segment(position)
+    
+    def add_segment(self, position) -> None: 
+        """
+        Create a new segment and append to segment list.
+        """       
+        new_segment = Turtle(shape="square")
+        new_segment.penup()
+        new_segment.color("white")
+        new_segment.goto(position)
+        self.segments.append(new_segment)
+
+    def extend(self):
+        """
+        Extend the segment by 1 to increase the size of snake.
+        """
+        self.add_segment(self.segments[-1].position())
 
     def move(self) -> None:
         """
