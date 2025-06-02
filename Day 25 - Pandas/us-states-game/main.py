@@ -27,10 +27,7 @@ while len(correct_guesses) < 50:
     # Add missed states to the csv file 
     # Keep the screen until user cancel or exit
     if guessed_state == "Exit":
-        missed_states = []
-        for state in state_names:
-            if state not in correct_guesses:
-                missed_states.append(state)
+        missed_states = [state for state in state_names if state not in correct_guesses]
         missing_state_csv = pandas.DataFrame(missed_states)
         missing_state_csv.to_csv("states_to_learn.csv")
         break   
