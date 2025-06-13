@@ -1,9 +1,23 @@
+import json
 import random
 from tkinter import *
 from tkinter import messagebox
 import pyperclip
 
 FONT_NAME = "Courier"
+
+# ---------------------------- FIND PASSWORD ------------------------------- #
+
+def find_password():
+    try:
+        with open("day-29-password-manager-gui-tkinter/data.json", "r") as data_file:
+            data: dict = json.load(data_file)
+            website_data = data[website_input.get()]
+            messagebox.showinfo(title=website_input.get(), message=f"Email: {website_data['email']}\nPassword: {website_data['password']}")
+    except FileNotFoundError:
+        messagebox.showerror(title="Error", message="No Data File Found.")
+    except KeyError as k:
+        messagebox.showerror(title="Error", message=f"No details for the {k} website Found.")
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
@@ -27,6 +41,12 @@ def save():
     website = website_input.get()
     email = email_input.get()
     password = password_input.get()
+    new_data = {
+        website :{
+            "email": email,
+            "password": password
+        }
+    }
     
     if len(website) == 0 or len(password) == 0:
         messagebox.showinfo(title="Oops", message="Please don't leave any fields empty!")
@@ -35,8 +55,17 @@ def save():
         is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail: {email}"
                                                                 f"\nPassword: {password} \n Is it ok to save?")
         if is_ok:
-            with open("day-29-password-manager-gui-tkinter/data.txt", "a") as data:
-                data.write(f"{website} | {email} | {password}\n")
+            try:
+                with open("day-29-password-manager-gui-tkinter/data.json", "r") as data_file:
+                    data: dict = json.load(data_file)
+            except FileNotFoundError:                
+                with open("day-29-password-manager-gui-tkinter/data.json", "w") as data_file:
+                    json.dump(new_data, data_file, indent=4)
+            else:
+                data.update(new_data)                
+                with open("day-29-password-manager-gui-tkinter/data.json", "w") as data_file:
+                    json.dump(data, data_file, indent=4)
+            finally:                    
                 website_input.delete(0, END)
                 password_input.delete(0, END)
                 website_input.focus()
@@ -54,7 +83,7 @@ canvas.grid(row=0, column=1)
 website_label = Label(text="Website:")
 website_label.grid(row=1, column=0)
 
-website_input = Entry(width=35)
+website_input = Entry(width=21)
 website_input.grid(row=1, column=1, columnspan=2)
 website_input.focus()
 
@@ -76,5 +105,9 @@ generate_password_button.grid(row=3, column=2)
 
 add_button = Button(text="Add", width=36, command=save)
 add_button.grid(row=4, column=1, columnspan=2)
+
+search_button = Button(text="Search", width=15, command=find_password)
+search_button.grid(row=1, column=2)
+
 
 window.mainloop()
