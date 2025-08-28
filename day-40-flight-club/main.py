@@ -16,6 +16,7 @@ from flight_data import find_cheapest_flight
 # ==================== Set up the Flight Search ====================
 
 data_manager = DataManager()
+user_data = data_manager.get_customer_emails()
 sheet_data = data_manager.get_price_data_from_sheet()
 flight_search = FlightSearch()
 
