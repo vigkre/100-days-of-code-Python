@@ -1,28 +1,30 @@
 """
 This script interacts with Sheety API endpoints to hold cities and their flight ticket
-price in a google sheet. 
+price in a google sheet and notify the users
 
 It includes functions to:
     - Use Sheety API to read and write data into google sheet
     - Get IATA City code using Amadeus
-    - Search and find for cheapest flight 
+    - Search and find for cheapest flight
+    - Notify the users when there is a good flight deal via email using SMTP
 """
 import time
 from datetime import datetime, timedelta
 from data_manager import DataManager
+from notification_manager import NotificationManager
 from flight_search import FlightSearch
 from flight_data import find_cheapest_flight
 
 # ==================== Set up the Flight Search ====================
 
 data_manager = DataManager()
-user_data = data_manager.get_customer_emails()
+notify_manager = NotificationManager()
+user_emails = data_manager.get_customer_emails()
 sheet_data = data_manager.get_price_data_from_sheet()
 flight_search = FlightSearch()
 
 # Set your origin airport
 ORIGIN_CITY_IATA = "LON"
-
 
 # ==================== Update the Airport Codes in Google Sheet ====================
 
@@ -50,7 +52,8 @@ for destination in sheet_data:
         to_time=six_month_from_today
     )
     cheapest_flight = find_cheapest_flight(flights)
-    print(f"{destination['city']}: £{cheapest_flight.price}")
+    message = f"{destination['city']}: £{cheapest_flight.price}"
+    notify_manager.send_emails(user_emails, message)
     # Slowing down requests to avoid rate limit
     time.sleep(2)
     
@@ -65,4 +68,5 @@ for destination in sheet_data:
             is_direct="false",
         )
         cheapest_flight = find_cheapest_flight(stopover_flights)
-        print(f"Cheapest indirect flight price is: £{cheapest_flight.price}")
+        message = f"Cheapest indirect flight price is: £{cheapest_flight.price}"
+        notify_manager.send_emails(user_emails, message)
