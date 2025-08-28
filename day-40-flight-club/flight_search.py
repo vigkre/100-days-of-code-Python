@@ -87,7 +87,7 @@ class FlightSearch:
         return code
 
     def check_flights(
-        self, origin_city_code, destination_city_code, from_time: datetime, to_time: datetime
+        self, origin_city_code, destination_city_code, from_time: datetime, to_time: datetime, is_direct: str="true"
     ):
         """
         Searches for flight options between two cities on specified departure and return dates
@@ -98,6 +98,7 @@ class FlightSearch:
             destination_city_code (str): The IATA code of the destination city.
             from_time (datetime): The departure date.
             to_time (datetime): The return date.
+            is_direct (str): if set to true, the search will find only flights going from the origin to the destination with no stop in between.
 
         Returns:
             dict or None: A dictionary containing flight offer data if the query is successful; None
@@ -117,7 +118,7 @@ class FlightSearch:
             "departureDate": from_time.strftime("%Y-%m-%d"),
             "returnDate": to_time.strftime("%Y-%m-%d"),
             "adults": 1,
-            "nonStop": "true",
+            "nonStop": f"{is_direct}",
             "currencyCode": "GBP",
             "max": "10",
         }
